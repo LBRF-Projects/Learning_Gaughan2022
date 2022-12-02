@@ -21,10 +21,14 @@ auto_generate_count = 10  # number of figures to generate in auto-generate/captu
 #########################################
 # Digital Trigger Configuration
 #########################################
-requires_triggers = False
+requires_triggers = True
 labjack_port = 'FIO' # Either FIO, EIO, or CIO
 trigger_codes = {
-
+    'trial_start': 2,
+    'animation_start': 4,
+    'circle_on': 6,
+    'imagery_start': 8,
+    'trial_end': 10,
 }
 
 #########################################
