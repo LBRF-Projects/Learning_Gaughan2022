@@ -184,6 +184,11 @@ exclude_data_cols = [
 # it will automatically be used for each participant without prompting.
 session_structures = {
     'a': [
-        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'PP-XX'] # session 1
+        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX'], # session 1 (6 blocks)
+        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX'], # session 2 (6 blocks)
+        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX'], # session 3 (6 blocks)
+        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX'], # session 4 (6 blocks)
+        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'MI-XX',
+         'PP-XX', 'PP-XX', 'PP-XX', 'PP-XX', 'PP-XX', 'PP-XX'], # session 5 (12 blocks)
     ]
 }
