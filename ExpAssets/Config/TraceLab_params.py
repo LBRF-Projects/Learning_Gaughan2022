@@ -29,6 +29,8 @@ trigger_codes = {
     'circle_on': 6,
     'imagery_start': 8,
     'trial_end': 10,
+    'acc_rating': 16,
+    'vivid_rating': 18,
 }
 
 #########################################

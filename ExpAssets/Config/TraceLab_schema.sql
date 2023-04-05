@@ -74,7 +74,9 @@ CREATE TABLE trials (
 	it               FLOAT                             NOT NULL,
 	control_question TEXT                              NOT NULL,
 	control_response INTEGER                           NOT NULL,
-	mt               FLOAT                             NOT NULL
+	mt               FLOAT                             NOT NULL,
+	acc_rating       TEXT                              NOT NULL,
+	vivid_rating     TEXT                              NOT NULL
 );
 
 CREATE TABLE sessions (

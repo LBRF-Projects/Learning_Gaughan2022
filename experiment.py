@@ -26,6 +26,7 @@ from TraceLabSession import TraceLabSession
 from TraceLabFigure import TraceLabFigure
 from ButtonBar import ButtonBar
 from KeyFrames import FrameSet
+from InterfaceExtras import LikertPrompt, Aesthetics
 
 
 if P.labjack_available:
@@ -154,6 +155,7 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 	def setup(self):
 
 		# Set up custom text styles for the experiment
+		self.txtm.add_style('large', '20px', [255, 255, 255, 255])
 		self.txtm.add_style('instructions', 18, [255, 255, 255, 255])
 		self.txtm.add_style('error', 18, [255, 0, 0, 255])
 		self.txtm.add_style('tiny', 12, [255, 255, 255, 255])
@@ -239,6 +241,30 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.practice_button_bar = ButtonBar(
 			practice_buttons,
 			[200, 100], P.btn_s_pad, P.y_pad, finish_button=False
+		)
+
+		# Set up Likert-type scales for collecting imagery accuracy/vividness ratings
+		scale_width = int(P.screen_x * 0.60)
+		scale_aes = Aesthetics(fill = (128, 128, 128, 64), fontstyle="large")
+		acc_msg_pp = message(
+			"How accurate do you think your tracing was?", "large", blit_txt=False
+		)
+		acc_msg_mi = message(
+			"How accurate was the movement you imagined?", "large", blit_txt=False
+		)
+		vividness_txt = "How vivid was your motor imagery over the last {0} trials?"
+		vividness_msg = message(
+			vividness_txt.format(P.trials_per_block), "large", blit_txt=False
+		)
+		
+		self.acc_rating_pp = LikertPrompt(
+			1, 10, acc_msg_pp, width=scale_width, origin=P.screen_c, aes=scale_aes
+		)
+		self.acc_rating_mi = LikertPrompt(
+			1, 10, acc_msg_mi, width=scale_width, origin=P.screen_c, aes=scale_aes
+		)
+		self.vividness_rating = LikertPrompt(
+			1, 10, vividness_msg, width=scale_width, origin=P.screen_c, aes=scale_aes
 		)
 
 		# Import all pre-generated figures needed for the current session
@@ -387,16 +413,33 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		animate_time = self.evm.trial_time - animate_start
 		avg_velocity = self.figure.path_length / animate_time
 
-		if self.response_type == PHYS:
+		# Collect the correct type of response for the trial
+		if self.response_type == "physical":
 			self.physical_trial()
-		elif self.response_type == MOTR:
+		elif self.response_type == "imagery":
 			self.imagery_trial()
 		else:
 			self.control_trial()
-
 		self.trigger.send('trial_end')
-		fill()
-		flip()
+
+		acc_rating = "NA"
+		vividness_rating = "NA"
+		if self.response_type == "physical":
+			# Collect accuracy rating after each physical trial
+			resp = self.acc_rating_pp.collect()
+			self.trigger.send("acc_rating")
+			acc_rating = resp.value
+		
+		elif self.response_type == "imagery":
+			# Collect accuracy rating after each imagery trial
+			resp = self.acc_rating_mi.collect()
+			self.trigger.send("acc_rating")
+			acc_rating = resp.value
+			# On the last trial of each imagery block, get MI vividness rating
+			if P.trial_number == P.trials_per_block:
+				resp = self.vividness_rating.collect()
+				self.trigger.send("vivid_rating")
+				vividness_rating = resp.value
 
 		if self.__practicing__:
 			return
@@ -418,7 +461,9 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 			"it": self.it,
 			"control_question": self.control_question if self.response_type == CTRL else 'NA',
 			"control_response": self.control_response,
-			"mt": self.mt
+			"mt": self.mt,
+			"acc_rating": acc_rating,
+			"vivid_rating": vividness_rating,
 		}
 
 
